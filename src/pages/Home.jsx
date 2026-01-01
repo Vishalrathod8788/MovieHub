@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import Navbar from '../components/Navbar.jsx';
 import MovieCard from '../components/MovieCard.jsx';
-import { getPopularMovies } from '../utils/api';
 
 const Home = () => {
   const [movies, setMovies] = useState([]);
@@ -10,18 +9,51 @@ const Home = () => {
   useEffect(() => {
     const fetchMovies = async () => {
       try {
-        console.log('Fetching popular movies...');
-        const data = await getPopularMovies();
-        console.log('API Response:', data);
+        const API_KEY = import.meta.env.VITE_TMDB_API_KEY;
+
+        const response = await fetch(`https://api.themoviedb.org/3/movie/popular?api_key=${API_KEY}`, {
+          timeout: 10000
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+
         if (data.results) {
           setMovies(data.results.slice(0, 20));
-        } else {
-          console.error('No results in API response:', data);
-          setMovies([]);
         }
       } catch (error) {
-        console.error('Error fetching movies:', error);
-        setMovies([]);
+        console.error('API Error:', error);
+        // Fallback mock data
+        const mockMovies = [
+          {
+            id: 1,
+            title: "The Shawshank Redemption",
+            poster_path: "/q6y0Go1tsGEsmtFryDOJo3dEmqu.jpg",
+            overview: "Two imprisoned men bond over a number of years...",
+            release_date: "1994-09-23",
+            vote_average: 9.3
+          },
+          {
+            id: 2,
+            title: "The Godfather",
+            poster_path: "/3bhkrj58Vtu7enYsRolD1fZdja1.jpg",
+            overview: "The aging patriarch of an organized crime dynasty...",
+            release_date: "1972-03-14",
+            vote_average: 9.2
+          },
+          {
+            id: 3,
+            title: "The Dark Knight",
+            poster_path: "/qJ2tW6WMUDux911r6m7haRef0WH.jpg",
+            overview: "Batman raises the stakes in his war on crime...",
+            release_date: "2008-07-18",
+            vote_average: 9.0
+          }
+        ];
+        setMovies(mockMovies);
       } finally {
         setLoading(false);
       }
@@ -33,7 +65,7 @@ const Home = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-blue-900 to-purple-900">
       <Navbar />
-      
+
       {/* Hero Section */}
       <div className="relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-r from-blue-600/20 to-purple-600/20"></div>
@@ -46,10 +78,16 @@ const Home = () => {
               Discover millions of movies, TV shows and people. Explore what's trending and find your next favorite.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <button className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-3 rounded-full font-semibold transition-all duration-300 transform hover:scale-105 shadow-lg">
+              <button
+                onClick={() => window.scrollTo({ top: document.querySelector('.container').offsetTop + 400, behavior: 'smooth' })}
+                className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-3 rounded-full font-semibold transition-all duration-300 transform hover:scale-105 shadow-lg"
+              >
                 Explore Movies
               </button>
-              <button className="border-2 border-white/30 text-white hover:bg-white/10 px-8 py-3 rounded-full font-semibold transition-all duration-300 backdrop-blur-sm">
+              <button
+                onClick={() => window.open('https://www.youtube.com/watch?v=TcMBFSGVi1c', '_blank')}
+                className="border-2 border-white/30 text-white hover:bg-white/10 px-8 py-3 rounded-full font-semibold transition-all duration-300 backdrop-blur-sm"
+              >
                 Watch Trailer
               </button>
             </div>
@@ -72,7 +110,7 @@ const Home = () => {
             View All →
           </button>
         </div>
-        
+
         {loading ? (
           <div className="flex justify-center items-center py-20">
             <div className="relative">
@@ -106,7 +144,7 @@ const Home = () => {
               Your ultimate destination for movie discovery and entertainment
             </p>
           </div>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="text-center group">
               <div className="w-16 h-16 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
@@ -117,7 +155,7 @@ const Home = () => {
               <h3 className="text-xl font-bold text-white mb-2">Smart Search</h3>
               <p className="text-gray-400">Find any movie instantly with our powerful search engine</p>
             </div>
-            
+
             <div className="text-center group">
               <div className="w-16 h-16 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
                 <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -127,7 +165,7 @@ const Home = () => {
               <h3 className="text-xl font-bold text-white mb-2">Personalized</h3>
               <p className="text-gray-400">Get recommendations based on your preferences</p>
             </div>
-            
+
             <div className="text-center group">
               <div className="w-16 h-16 bg-gradient-to-r from-pink-600 to-red-600 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
                 <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
