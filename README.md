@@ -25,7 +25,7 @@ A modern movie database application built with React, Redux Toolkit, and Tailwin
 
 1. Clone the repository:
 ```bash
-git clone <repository-url>
+git clone git@github.com:Vishalrathod8788/MovieHub.git
 cd MovieHub
 ```
 
